@@ -1,0 +1,89 @@
+
+---
+title: "Mixture Model Analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This document demonstrates how to analyze a dataset using mixture models. The dataset contains variables like performance, stress levels, age, and gender. We will identify latent subgroups (classes) in the data using mixture modeling techniques.
+
+---
+
+## Step 1: Load the Data
+
+```{r load-data}
+# Load necessary libraries
+library(tidyverse)
+
+# Load the dataset (assuming it's in the same folder as this Rmd file)
+data <- read.csv("mixture_data.csv")
+
+# Quick look at the data
+head(data)
+summary(data)
+```
+
+---
+
+## Step 2: Visualize the Data
+
+```{r visualize-data}
+# Distribution of performance
+ggplot(data, aes(x = Performance)) +
+  geom_histogram(binwidth = 5, fill = "steelblue", color = "black") +
+  labs(title = "Performance Distribution", x = "Performance", y = "Count")
+
+# Distribution of stress
+ggplot(data, aes(x = Stress)) +
+  geom_histogram(binwidth = 1, fill = "orange", color = "black") +
+  labs(title = "Stress Distribution", x = "Stress Level", y = "Count")
+
+# Scatterplot: Performance vs Stress
+ggplot(data, aes(x = Stress, y = Performance, color = Gender)) +
+  geom_point(size = 3) +
+  labs(title = "Performance vs Stress", x = "Stress Level", y = "Performance")
+```
+
+---
+
+## Step 3: Fit a Mixture Model
+
+```{r fit-mixture-model, message=FALSE, warning=FALSE}
+# Load the mixture modeling library
+library(mclust)
+
+# Fit a mixture model
+mixture_model <- Mclust(data[, c("Performance", "Stress")])
+
+# Summary of the mixture model
+summary(mixture_model)
+
+# Plot the mixture model results
+plot(mixture_model, what = "classification")
+```
+
+---
+
+## Step 4: Interpret Results
+
+```{r interpret-results}
+# Display the classification
+data$Class <- mixture_model$classification
+table(data$Class)
+
+# Visualize the classes
+ggplot(data, aes(x = Stress, y = Performance, color = factor(Class))) +
+  geom_point(size = 3) +
+  labs(title = "Mixture Model Classes", x = "Stress Level", y = "Performance", color = "Class")
+```
+
+---
+
+## Conclusion
+
+This document provides a simple framework for mixture model analysis. The dataset has been split into latent classes based on performance and stress. You can extend this analysis by incorporating more variables or testing alternative model structures.
